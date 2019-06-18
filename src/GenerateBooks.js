@@ -59,26 +59,29 @@ class GenerateBooks extends React.Component{
     }
 
   componentDidMount(){
-    console.log ("componentWillMount");
+    console.log ("componentDidMount");
     let promise = BooksAPI.getAll();
     let results = promise.then(res => {
           this.setState({ results : res});
           return res;
     },(data) => {
       return data;
-    }
-  );
+    });
   }
    render(){
     let valuesArray = Object.values(this.state.results);
       return(<ol className="books-grid">
                  {this.state.results.filter (book =>{
-                                                  return book.shelf === 'currentlyReading'
-                 }).map(b => {return (<GenerateBook key={b.industryIdentifiers.identifier} bookTitle={b.title} bookAuthors={b.authors}
-                                                    imageLinks={b.imageLinks}></GenerateBook>
-                                     )
-                                }
-                        )
+                                                    return book.shelf === this.props.readingState})
+                                            .map(b => {return (<GenerateBook key={b.industryIdentifiers.identifier} 
+                                                                                bookTitle={b.title} 
+                                                                                bookAuthors={b.authors}
+                                                                                imageLinks={b.imageLinks}
+                                                                                readingState={this.props.readingState}>
+                                                                    </GenerateBook>
+                                                                )
+                                                            }
+                                                    )
                 }
             </ol>)
       }

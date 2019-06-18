@@ -9,7 +9,7 @@ class GenerateBook extends React.Component{
                 <div className="book-top">
                 <div className="book-cover" 
                   style={{ width: 128, height: 193, backgroundImage: `url("${this.props.imageLinks.thumbnail}")`}}></div>
-                  <BookShelfChanger></BookShelfChanger> 
+                  <BookShelfChanger readingState={this.props.readingState}></BookShelfChanger> 
                   </div>                
                 <div className="book-title">{this.props.bookTitle}</div>
                 <div className="book-authors">{this.props.bookAuthors}</div>
