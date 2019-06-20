@@ -7,7 +7,7 @@ class BookShelf extends React.Component{
       return( <div className="bookshelf">
               <h2 className="bookshelf-title">{this.props.shelfDescription}</h2>
                 <div className="bookshelf-books">
-                    <GenerateBooks readingState={this.props.readingState}></GenerateBooks>
+                    <GenerateBooks books={this.props.books} readingState={this.props.readingState}></GenerateBooks>
                 </div>
               </div>);
       }
