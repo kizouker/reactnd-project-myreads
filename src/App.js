@@ -8,7 +8,11 @@ class BooksApp extends React.Component {
   readingStates =  [{"currentlyReading" : "Currently Reading"},
                     {"wantToRead" : "Want to Read"},
                     {"read" : "Read"}];
-        
+  
+  readingStates2 =  {"currentlyReading" : "Currently Reading",
+                    "wantToRead" : "Want to Read",
+                    "read" : "Read"
+                  }
   state = {
     /**
      * TODO: Instead of using this state variable to keep track of which page
@@ -31,21 +35,24 @@ class BooksApp extends React.Component {
   render() {
       return (
       <div className="app">
-        {this.state.showSearchPage ? (
-         <SearchField></SearchField>
-        ) : (
+        {this.state.showSearchPage ? (<SearchField></SearchField>):(
           <div className="list-books">
             <div className="list-books-title">
               <h1>MyReads</h1>
             </div>
             <div className="list-books-content">
               <div>
-                {
-                  this.keys.map(element => {
-                    return (<BookShelf readingState={element}> </BookShelf>)
-                })
-              }
-           
+                {this.keys.map(key => {
+                  this.readingStates.filter (e => 
+                                              { //console.log(e);
+                                               console.log(e[key]);
+                                                return e === key}
+                                              )
+
+                  console.log(key);
+                    return (<BookShelf readingState={key} shelfDescription={this.readingStates.filter(e => 
+                      e===key)}> </BookShelf>)
+                })}
               </div>
             </div>
             <div className="open-search">

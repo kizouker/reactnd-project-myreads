@@ -6,7 +6,9 @@ import * as BooksAPI from './BooksAPI';
 class GenerateBooks extends React.Component{
     constructor(props){
       super(props);
-      this.state = {results: [
+   
+      this.state = {
+        books: [
         {
             "title": "The Linux Command Line",
             "subtitle": "A Complete Introduction",
@@ -58,31 +60,35 @@ class GenerateBooks extends React.Component{
       }
     }
 
+changeShelf = (bookId, newshelf) => {
+    //this.setState({books : })
+    this.state.books.filter (b => {
+        return b.id === bookId;
+    })
+}
+
+    
   componentDidMount(){
     console.log ("componentDidMount");
     let promise = BooksAPI.getAll();
-    let results = promise.then(res => {
-          this.setState({ results : res});
+    let books = promise.then(res => {
+          this.setState({ books : res});
           return res;
     },(data) => {
       return data;
     });
   }
    render(){
-    let valuesArray = Object.values(this.state.results);
       return(<ol className="books-grid">
-                 {this.state.results.filter (book =>{
+                 {this.state.books.filter (book =>{
                                                     return book.shelf === this.props.readingState})
-                                            .map(b => {return (<GenerateBook key={b.industryIdentifiers.identifier} 
+                                            .map(b => {return (<GenerateBook    key={b.industryIdentifiers.identifier} 
                                                                                 bookTitle={b.title} 
                                                                                 bookAuthors={b.authors}
                                                                                 imageLinks={b.imageLinks}
-                                                                                readingState={this.props.readingState}>
-                                                                    </GenerateBook>
-                                                                )
-                                                            }
-                                                    )
-                }
+                                                                                id={b.id}
+                                                                                shelf={b.shelf}>
+                                                                </GenerateBook>)})}
             </ol>)
       }
 }
