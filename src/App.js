@@ -6,6 +6,8 @@ import * as BooksAPI from './BooksAPI';
       
 class BooksApp extends React.Component {
 
+  currentlyReadingBooks =''; 
+
   readingStates =  [{"currentlyReading" : "Currently Reading"},
                     {"wantToRead" : "Want to Read"},
                     {"read" : "Read"}];
@@ -103,16 +105,15 @@ class BooksApp extends React.Component {
             </div>
             <div className="list-books-content">
               <div>
-                {this.keys.map(key => {
-                  this.readingStates.filter (e => 
-                                              { //console.log(e);
-                                               console.log(e[key]);
-                                                return e === key}
-                                              )
-                  console.log(key);
-                    return (<BookShelf books={this.state.books} readingState={key} shelfDescription={this.readingStates.filter(e => 
-                      e===key)}> </BookShelf>)
-                })}
+                <ol className="books-grid">
+                { this.currentlyReadingBooks = this.state.books.filter(book => {
+                                                    return book.shelf === 'wantToRead'
+                                                  })}  
+                                                  {console.log(this.currentlyReadingBooks)             
+                }
+                <BookShelf books={this.currentlyReadingBooks} readingState='wantToRead'>                
+                </BookShelf>
+                </ol>                
               </div>
             </div>
             <div className="open-search">

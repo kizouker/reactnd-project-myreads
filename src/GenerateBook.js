@@ -3,16 +3,13 @@ import './App.css';
 import BookShelfChanger from './BookShelfChanger';
 
 class GenerateBook extends React.Component{
-
   state = {
       shelf : this.props.shelf
   }
-
   changeShelf = (newShelf) => {
     this.setState ({shelf: newShelf})
     console.log("newShelf:  " +newShelf);
   }
-
   render(){
     return(<li>
               <div className="book">  
@@ -28,5 +25,4 @@ class GenerateBook extends React.Component{
           </li>)
   }
 }
-
 export default GenerateBook;
