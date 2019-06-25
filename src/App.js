@@ -5,8 +5,12 @@ import BookShelf from './BookShelf';
 import * as BooksAPI from './BooksAPI';
       
 class BooksApp extends React.Component {
-
-  currentlyReadingBooks =''; 
+  constructor(props){
+    super(props);
+    this.addItem = this.addItem.bind(this);
+  //  this.removeBook = this.removeBook.bind(this);
+  }
+  currentlyReadingBooks = [];
 
   readingStates =  [{"currentlyReading" : "Currently Reading"},
                     {"wantToRead" : "Want to Read"},
@@ -94,8 +98,56 @@ class BooksApp extends React.Component {
       }).filter((col, i, array) => {
           return array.indexOf(col) === i
       })
-  
+
+      removeBook = (bookId) => {
+        console.log("remove book id: "+ bookId + " title: ");
+        this.setState(prevState => ({books: this.state.books.filter(book => {
+          return book.id !== bookId
+          })}
+        ))
+        console.log("remove id end");
+      }
+
+      addItem = (book) => {
+        console.log("add item id: "+ book.id + " title: "+ book.title);
+        this.setState(oldState => ({
+          books : [...oldState.books,  book]
+        }))
+        console.log("End additem");
+      }
+      
+      changeShelf1 = (newShelf) => {
+        this.setState({shelf : newShelf})
+      }
+
+      deleteLastItem = event => {
+        console.log("deleteLastItem");
+        this.setState(prevState => ({ books: this.state.books.slice(0, -1) }));
+        console.log("End deleteItem");
+    };
+
+    changeShelf = (bookId, shelf) => {
+      console.log("changeShelf2 id: "+ bookId + " title: ");
+      let book = this.state.books.find(book => {
+        return book.id === bookId
+      })
+      book.shelf = shelf;
+
+      this.removeBook(book.id);
+      this.addItem(book);
+      console.log("changeShelf2 end");
+    }
+
   render() {
+      this.currentlyReadingBooks = this.state.books.filter(e => {
+      return e.shelf === "currentlyReading"});
+     
+      this.wantToReadBooks = this.state.books.filter(e => {
+      return e.shelf === "wantToRead"});
+
+      this.readBooks = this.state.books.filter(e => {
+      return e.shelf === "read"});
+
       return (
       <div className="app">
         {this.state.showSearchPage ? (<SearchField></SearchField>):(
@@ -105,15 +157,21 @@ class BooksApp extends React.Component {
             </div>
             <div className="list-books-content">
               <div>
-                <ol className="books-grid">
-                { this.currentlyReadingBooks = this.state.books.filter(book => {
-                                                    return book.shelf === 'wantToRead'
-                                                  })}  
-                                                  {console.log(this.currentlyReadingBooks)             
-                }
-                <BookShelf books={this.currentlyReadingBooks} readingState='wantToRead'>                
-                </BookShelf>
-                </ol>                
+           
+                 {<BookShelf books={this.currentlyReadingBooks} readingState='currentlyReading' 
+                 shelfDescription='Currently Reading' removeBook={this.removeBook} changeShelf={this.changeShelf}>                
+                  </BookShelf>}
+                
+            
+                 {<BookShelf books={this.wantToReadBooks} readingState='wantToRead'
+                 shelfDescription='Want to read' removeBook={this.removeBook} changeShelf={this.changeShelf}>                
+                  </BookShelf>}
+            
+               
+                 {<BookShelf books={this.readBooks} readingState='read'
+                 shelfDescription='Read' removeBook={this.removeBook} changeShelf={this.changeShelf}>                
+                  </BookShelf>}  
+                       
               </div>
             </div>
             <div className="open-search">
