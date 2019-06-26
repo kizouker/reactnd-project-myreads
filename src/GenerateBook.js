@@ -11,7 +11,6 @@ class GenerateBook extends React.Component{
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
   }
-
   
   render(){
     return(<div className="book">  

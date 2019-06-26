@@ -6,8 +6,9 @@ class BookShelf extends React.Component{
 
   constructor(props){
     super(props);
-    this.removeBook = this.props.changeShelf.bind(this);
+    this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
+
   }
     render(){  
       return( 
@@ -18,6 +19,7 @@ class BookShelf extends React.Component{
                   <li>
                   
                   { this.props.books.map((b) => {
+                    console.log(this.props.books);
                     return(<GenerateBook key={b.id} bookTitle={b.title} bookAuthors={b.authors}
                                   imageLinks={b.imageLinks} id={b.id} shelf={b.shelf} 
                                   books={this.props.books} readingState={this.props.readingState} 

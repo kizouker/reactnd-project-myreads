@@ -1,14 +1,18 @@
 import React from 'react';
 import './App.css';
+import BookShelf from './BookShelf';
 
 class SearchField extends React.Component{
-  state = {
-    book : {  "book-title": '',
-              "book-authors" : '',
-              "book-cover" : ''      
-    }
+  constructor(props){
+    super(props);
+    this.handleChange = this.handleChange.bind(this)
+  }
+  handleChange = (event) => {
+    console.log("value: "+event.target.value);
+    this.props.searchBook(event.target.value);
   }
 render(){
+  
   return( <div className="search-books">
               <div className="search-books-bar">
                 <button className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</button>
@@ -21,7 +25,7 @@ render(){
                     However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                     you don't find a specific author or title. Every search is limited by search terms.
                   */}
-                  <input type="text" placeholder="Search by title or author"/>
+                  <input type="text" placeholder="Search by title or author" onChange={e => this.handleChange(e)}/>
                 </div>
               </div>
                 <div className="search-books-results">

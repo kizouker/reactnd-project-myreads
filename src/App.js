@@ -8,18 +8,8 @@ class BooksApp extends React.Component {
   constructor(props){
     super(props);
     this.addItem = this.addItem.bind(this);
-  //  this.removeBook = this.removeBook.bind(this);
+    this.searchBook = this.searchBook.bind(this);
   }
-  currentlyReadingBooks = [];
-
-  readingStates =  [{"currentlyReading" : "Currently Reading"},
-                    {"wantToRead" : "Want to Read"},
-                    {"read" : "Read"}];
-  
-  readingStates2 =  {"currentlyReading" : "Currently Reading",
-                    "wantToRead" : "Want to Read",
-                    "read" : "Read"
-                  }
   state = {
     /**
      * TODO: Instead of using this state variable to keep track of which page
@@ -80,10 +70,46 @@ class BooksApp extends React.Component {
       }]
   }
 
+
+  wantToReadBooks = this.state.books.filter(e => {
+    return e.shelf === "wantToRead"});
+currentlyReadingBooks = this.state.books.filter(e => {
+  return e.shelf === "currentlyReading"});
+  
+
+
+readBooks = this.state.books.filter(e => {
+  return e.shelf === "read"});
+
+readingStates =  [{ shelf : "currentlyReading",  
+                    description : "Currently Reading",
+                    books: this.currentlyReadingBooks
+                  },
+                  { shelf: "wantToRead", 
+                    description : "Want to Read",
+                    books: this.wantToReadBooks
+                  },
+                  { shelf : "read",  
+                    description : "Read", 
+                    books: this.readBooks
+                  }];
+
   componentDidMount(){
     console.log ("componentDidMount");
     let promise = BooksAPI.getAll();
     let books = promise.then(res => {
+          this.setState({ books : res});
+          return res;
+    },(data) => {
+      return data;
+    });
+  }
+
+  searchBook(searchString){
+    console.log ("search");
+    let promise = BooksAPI.search(searchString);
+    let books = promise.then(res => {
+      console.log(res);
           this.setState({ books : res});
           return res;
     },(data) => {
@@ -115,17 +141,7 @@ class BooksApp extends React.Component {
         }))
         console.log("End additem");
       }
-      
-      changeShelf1 = (newShelf) => {
-        this.setState({shelf : newShelf})
-      }
-
-      deleteLastItem = event => {
-        console.log("deleteLastItem");
-        this.setState(prevState => ({ books: this.state.books.slice(0, -1) }));
-        console.log("End deleteItem");
-    };
-
+          
     changeShelf = (bookId, shelf) => {
       console.log("changeShelf2 id: "+ bookId + " title: ");
       let book = this.state.books.find(book => {
@@ -139,39 +155,25 @@ class BooksApp extends React.Component {
     }
 
   render() {
-      this.currentlyReadingBooks = this.state.books.filter(e => {
-      return e.shelf === "currentlyReading"});
-     
-      this.wantToReadBooks = this.state.books.filter(e => {
-      return e.shelf === "wantToRead"});
-
-      this.readBooks = this.state.books.filter(e => {
-      return e.shelf === "read"});
-
       return (
       <div className="app">
-        {this.state.showSearchPage ? (<SearchField></SearchField>):(
+        {this.state.showSearchPage ? (<SearchField searchBook={this.searchBook}></SearchField>):(
           <div className="list-books">
             <div className="list-books-title">
               <h1>MyReads</h1>
             </div>
             <div className="list-books-content">
               <div>
-           
-                 {<BookShelf books={this.currentlyReadingBooks} readingState='currentlyReading' 
-                 shelfDescription='Currently Reading' removeBook={this.removeBook} changeShelf={this.changeShelf}>                
-                  </BookShelf>}
-                
-            
-                 {<BookShelf books={this.wantToReadBooks} readingState='wantToRead'
-                 shelfDescription='Want to read' removeBook={this.removeBook} changeShelf={this.changeShelf}>                
-                  </BookShelf>}
-            
-               
-                 {<BookShelf books={this.readBooks} readingState='read'
-                 shelfDescription='Read' removeBook={this.removeBook} changeShelf={this.changeShelf}>                
-                  </BookShelf>}  
-                       
+              {this.readingStates.map(item => {
+                console.log("----------");
+                console.log(item.shelf);
+                console.log(item.description);
+                console.log(item.books);
+                console.log("----------");
+                 return (<BookShelf books={item.books} readingState={item.shelf} shelfDescription={item.description}
+                          removeBook={this.removeBook} changeShelf={this.changeShelf}> 
+                        </BookShelf>)
+               })}               
               </div>
             </div>
             <div className="open-search">
