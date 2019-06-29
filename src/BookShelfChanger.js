@@ -7,18 +7,12 @@ class BookShelfChanger extends React.Component{
     const target = event.target;
     const value = target.value;
     const name = target.name;
-  
-    console.log("name " +name);
-    console.log("target " +target);
-    console.log("target " +value);
 
     this.props.changeShelf(this.props.bookId, value);
    }
 
    handleSubmit = (e) => {
-    console.log("--- --- handleSubmit --- ---");
     e.preventDefault(); //prevent that the whole page reloads
-
   }
  
   render(){

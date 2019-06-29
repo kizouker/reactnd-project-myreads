@@ -9,6 +9,7 @@ class BooksApp extends React.Component {
     super(props);
     this.addItem = this.addItem.bind(this);
     this.searchBook = this.searchBook.bind(this);
+    this.compare = this.compare.bind(this);
   }
   state = {
     /**
@@ -17,8 +18,8 @@ class BooksApp extends React.Component {
      * users can use the browser's back and forward buttons to navigate between
      * pages, as well as provide a good URL they can bookmark and share.
      */
-
       showSearchPage: false,
+      searchResult: [],
       books: [
       {
           "title": "The Linux Command Line",
@@ -68,120 +69,132 @@ class BooksApp extends React.Component {
           "id": "nggnmAEACAAJ",
           "shelf": "currentlyReading"
       }]
-  }
+  };
+
+wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
 
 
-  wantToReadBooks = this.state.books.filter(e => {
-    return e.shelf === "wantToRead"});
-currentlyReadingBooks = this.state.books.filter(e => {
+
+componentDidMount(){
+  console.log ("componentDidMount");
+  let promise = BooksAPI.getAll();
+  promise.then(res => {
+        this.setState({ books : res});
+        return res;
+  },(data) => {
+    return data;
+  });
+}
+
+searchBook(searchString){
+  console.log ("search");
+  let promise = BooksAPI.search(searchString);
+  promise.then(res => {
+    console.log ("searchresult:")
+    console.log(res);
+        this.setState({ searchResult : res});
+        return res;
+  },(data) => {
+    return data;
+  });
+}
+
+removeBook = (bookId) => {
+//console.log("remove book id: "+ bookId + " title: ");
+this.setState(prevState => ({books: this.state.books.filter(book => {
+  return book.id !== bookId
+  })}
+))
+//console.log("remove id end");
+}
+
+addItem = (book) => {
+  //console.log("add item id: "+ book.id + " title: "+ book.title);
+  this.setState(oldState => ({
+    books : [...oldState.books,  book]
+  }))
+//console.log("End additem");
+}
+      
+changeShelf = (bookId, shelf) => {
+//console.log("changeShelf id: "+ bookId + " title: ");
+let book = this.state.books.find(book => {
+  return book.id === bookId
+})
+book.shelf = shelf;
+
+this.removeBook(book.id);
+this.addItem(book);
+//console.log("changeShelf end");
+}
+
+compare = () => this.state.searchResult.map(book => {
+  console.log("----------compare----------");
+//console.log(this.state.books);
+  const mybook = this.state.books.find(book);
+  console.log("----------compare----------")
+  console.log(mybook);
+  console.log("----------compare----------");
+  //return mybook;
+  
+});
+
+render() {
+  this.wantToReadBooks = this.state.books.filter(e => {
+  return e.shelf === "wantToRead"});
+  
+  this.currentlyReadingBooks = this.state.books.filter(e => {
   return e.shelf === "currentlyReading"});
   
-
-
-readBooks = this.state.books.filter(e => {
+  this.readBooks = this.state.books.filter(e => {
   return e.shelf === "read"});
-
-readingStates =  [{ shelf : "currentlyReading",  
-                    description : "Currently Reading",
-                    books: this.currentlyReadingBooks
-                  },
-                  { shelf: "wantToRead", 
-                    description : "Want to Read",
-                    books: this.wantToReadBooks
-                  },
-                  { shelf : "read",  
-                    description : "Read", 
-                    books: this.readBooks
-                  }];
-
-  componentDidMount(){
-    console.log ("componentDidMount");
-    let promise = BooksAPI.getAll();
-    let books = promise.then(res => {
-          this.setState({ books : res});
-          return res;
-    },(data) => {
-      return data;
-    });
-  }
-
-  searchBook(searchString){
-    console.log ("search");
-    let promise = BooksAPI.search(searchString);
-    let books = promise.then(res => {
-      console.log(res);
-          this.setState({ books : res});
-          return res;
-    },(data) => {
-      return data;
-    });
-  }
-  // keys = Object.values(this.readingStates);
-      keys = this.readingStates.map((o) => {
-          return Object.keys(o)
-      }).reduce((prev, curr) => {
-          return prev.concat(curr)
-      }).filter((col, i, array) => {
-          return array.indexOf(col) === i
-      })
-
-      removeBook = (bookId) => {
-        console.log("remove book id: "+ bookId + " title: ");
-        this.setState(prevState => ({books: this.state.books.filter(book => {
-          return book.id !== bookId
-          })}
-        ))
-        console.log("remove id end");
-      }
-
-      addItem = (book) => {
-        console.log("add item id: "+ book.id + " title: "+ book.title);
-        this.setState(oldState => ({
-          books : [...oldState.books,  book]
-        }))
-        console.log("End additem");
-      }
-          
-    changeShelf = (bookId, shelf) => {
-      console.log("changeShelf2 id: "+ bookId + " title: ");
-      let book = this.state.books.find(book => {
-        return book.id === bookId
-      })
-      book.shelf = shelf;
-
-      this.removeBook(book.id);
-      this.addItem(book);
-      console.log("changeShelf2 end");
-    }
-
-  render() {
-      return (
-      <div className="app">
-        {this.state.showSearchPage ? (<SearchField searchBook={this.searchBook}></SearchField>):(
-          <div className="list-books">
-            <div className="list-books-title">
-              <h1>MyReads</h1>
-            </div>
-            <div className="list-books-content">
-              <div>
-              {this.readingStates.map(item => {
-                console.log("----------");
-                console.log(item.shelf);
-                console.log(item.description);
-                console.log(item.books);
-                console.log("----------");
-                 return (<BookShelf books={item.books} readingState={item.shelf} shelfDescription={item.description}
-                          removeBook={this.removeBook} changeShelf={this.changeShelf}> 
-                        </BookShelf>)
-               })}               
-              </div>
-            </div>
-            <div className="open-search">
-              <button onClick={() => this.setState({ showSearchPage: true })}>Add a book</button>
+  
+  this.readingStates =  [{ shelf : "currentlyReading",  
+                      description : "Currently Reading",
+                      books: this.currentlyReadingBooks
+                    },
+                    { shelf: "wantToRead", 
+                      description : "Want to Read",
+                      books: this.wantToReadBooks
+                    },
+                    { shelf : "read",  
+                      description : "Read", 
+                      books: this.readBooks
+                    }];  
+   
+    return (
+    <div className="app">
+      {this.state.showSearchPage ? (<SearchField state={this.state} searchBook={this.searchBook} 
+                                                 readingStates={this.readingStates}
+                                                 removeBook={this.removeBook} 
+                                                 changeShelf={this.changeShelf}
+                                                 compare={this.compare}>
+                                    </SearchField>):(
+        <div className="list-books">
+          <div className="list-books-title">
+            <h1>MyReads</h1>
+          </div>
+          <div className="list-books-content">
+            <div>
+            {this.readingStates.map(item => {
+              //console.log("----------");
+              //console.log(item.shelf);
+              //console.log(item.description);
+              //console.log(item.books);
+              
+                return (<BookShelf books={item.books} readingState={item.shelf} 
+                        shelfDescription={item.description} removeBook={this.removeBook} 
+                        changeShelf={this.changeShelf}> 
+                      </BookShelf>)
+              })}               
             </div>
           </div>
-        )}
-      </div>
+          <div className="open-search">
+            <button onClick={() => this.setState({ showSearchPage: true })}>Add a book</button>
+          </div>
+        </div>
+      )}
+    </div>
     )
   }
 }
