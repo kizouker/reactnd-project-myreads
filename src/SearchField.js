@@ -16,10 +16,8 @@ wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
 
 handleChange = (event) => {
 // console.log("value: " + event.target.value);
-
  
   this.props.searchBook(event.target.value);
-
   this.props.compare();
 }
 render(){

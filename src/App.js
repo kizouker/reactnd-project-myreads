@@ -70,10 +70,7 @@ class BooksApp extends React.Component {
           "shelf": "currentlyReading"
       }]
   };
-
 wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
-
-
 
 componentDidMount(){
   console.log ("componentDidMount");
@@ -87,16 +84,18 @@ componentDidMount(){
 }
 
 searchBook(searchString){
-  console.log ("search");
+ // console.log ("search");
   let promise = BooksAPI.search(searchString);
   promise.then(res => {
-    console.log ("searchresult:")
-    console.log(res);
         this.setState({ searchResult : res});
+        //console.log(this.state.searchResult);
         return res;
   },(data) => {
     return data;
   });
+ console.log ("searchresult:")
+console.log(this.state.searchResult);
+ console.log ("searchresult:")
 }
 
 removeBook = (bookId) => {
@@ -128,16 +127,67 @@ this.addItem(book);
 //console.log("changeShelf end");
 }
 
-compare = () => this.state.searchResult.map(book => {
-  console.log("----------compare----------");
-//console.log(this.state.books);
-  const mybook = this.state.books.find(book);
-  console.log("----------compare----------")
-  console.log(mybook);
-  console.log("----------compare----------");
-  //return mybook;
-  
-});
+compare = () => this.state.books.map(allBook => {
+  //console.log(this.state.books);
+
+  let mybook2=[1, 2];
+  let mybook = this.state.searchResult.map(searchBook=> {
+    //console.log(searchBook);
+    if (searchBook !== undefined && allBook.id === searchBook.id){
+   // console.log(allBook);
+      searchBook.shelf = allBook.shelf;
+      console.log("hit");
+      return searchBook;
+    } else{
+      console.log("noitem");
+      return "noitem";
+    }
+  });
+
+     mybook2 = mybook.map(item => {
+      if (item === undefined){
+        console.log("item undefined");
+      }else {
+        console.log("ITEM : " + item);
+        return  ;
+      }
+    });
+    if (!(mybook2.length === 0 || mybook2 === undefined)){
+      //console.log("----------compare----------  start ---")
+      //console.log(searchBook); 
+      console.log(" these books are both in my shelves and in the search")
+      console.log(mybook2);
+    }
+   // can you reduce the list?
+   // why does it give you the undefined
+
+   // return searchBook;
+  });
+
+//  let mybook2 = this.state.books.find(allBook => {
+//    return allBook.id === searchBook.id
+//  });
+
+
+ 
+  //if (!(mybook2 == null || mybook2.length == 0 )){
+  //  console.log(" these books are both in my shelves and in the search 2")
+  //  console.log(mybook2);
+ // }
+
+    /** 
+  .map(item => {
+    if (item.shelf === '') 
+      searchBook.shelf='None';
+    else
+    {
+      console.log("shelf: " + item.shelf);
+      searchBook.shelf = item.shelf;
+    }
+  }
+  */
+
+ 
 
 render() {
   this.wantToReadBooks = this.state.books.filter(e => {
