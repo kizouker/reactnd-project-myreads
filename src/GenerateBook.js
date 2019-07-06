@@ -12,6 +12,8 @@ class GenerateBook extends React.Component{
     this.removeBook = this.props.removeBook.bind(this);
   }
   render(){
+
+    console.log("this.props: " + this.props);
     return(<div className="book">  
                 <div className="book-top">
                 <div className="book-cover" 

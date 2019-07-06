@@ -10,6 +10,7 @@ class BooksApp extends React.Component {
     this.addItem = this.addItem.bind(this);
     this.searchBook = this.searchBook.bind(this);
     this.compare = this.compare.bind(this);
+    
   }
   state = {
     /**
@@ -70,7 +71,7 @@ class BooksApp extends React.Component {
           "shelf": "currentlyReading"
       }]
   };
-wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
+wantToReadBooks; currentlyReadingBooks; readBooks; readingStates; totalResArray = [];
 
 componentDidMount(){
   console.log ("componentDidMount");
@@ -85,17 +86,44 @@ componentDidMount(){
 
 searchBook(searchString){
  // console.log ("search");
+ // how do I know if this is a sync or async call?
+ // how do I know if there is a search result when the compare fn is executed?
+
   let promise = BooksAPI.search(searchString);
   promise.then(res => {
-        this.setState({ searchResult : res});
-        //console.log(this.state.searchResult);
-        return res;
+
+    console.log ("--- res ---");
+    console.log(res);
+    console.log ("--- res ---");
+
+    if (res !== undefined || res.length !==0 ){
+     // this.setState({ searchResult : res});
+      let summa = this.compare(res); // will be called when the containing callback fn is called
+       if (summa !== undefined || summa.length!==0){
+         console.log(summa);
+         this.setState({searchResult : summa});
+      }
+    
+    } else {
+      this.setState({searchResult : []});
+    } 
+      return res;
+       /**                   
+        let summ2 = summa.filter(item => {
+         return item !== undefined;
+        })                   
+        console.log("cmp");
+        console.log(summ2);
+        console.log("-----");
+        
+        return res;         
+*/  
   },(data) => {
     return data;
   });
- console.log ("searchresult:")
-console.log(this.state.searchResult);
- console.log ("searchresult:")
+ // console.log ("searchresult:")
+ // console.log(this.state.searchResult);
+ // console.log ("searchresult:")
 }
 
 removeBook = (bookId) => {
@@ -127,67 +155,36 @@ this.addItem(book);
 //console.log("changeShelf end");
 }
 
-compare = () => this.state.books.map(allBook => {
-  //console.log(this.state.books);
-
-  let mybook2=[1, 2];
-  let mybook = this.state.searchResult.map(searchBook=> {
-    //console.log(searchBook);
-    if (searchBook !== undefined && allBook.id === searchBook.id){
-   // console.log(allBook);
+compare =  (searchresult) => searchresult.map(searchBook => { 
+  let book = "";
+   this.state.books.map(allBook => {
+    if (allBook.id === searchBook.id){
       searchBook.shelf = allBook.shelf;
-      console.log("hit");
-      return searchBook;
-    } else{
-      console.log("noitem");
-      return "noitem";
+      book = searchBook;
     }
   });
-
-     mybook2 = mybook.map(item => {
-      if (item === undefined){
-        console.log("item undefined");
-      }else {
-        console.log("ITEM : " + item);
-        return  ;
-      }
-    });
-    if (!(mybook2.length === 0 || mybook2 === undefined)){
-      //console.log("----------compare----------  start ---")
-      //console.log(searchBook); 
-      console.log(" these books are both in my shelves and in the search")
-      console.log(mybook2);
-    }
-   // can you reduce the list?
-   // why does it give you the undefined
-
-   // return searchBook;
-  });
-
-//  let mybook2 = this.state.books.find(allBook => {
-//    return allBook.id === searchBook.id
-//  });
-
-
- 
-  //if (!(mybook2 == null || mybook2.length == 0 )){
-  //  console.log(" these books are both in my shelves and in the search 2")
-  //  console.log(mybook2);
- // }
-
-    /** 
-  .map(item => {
-    if (item.shelf === '') 
-      searchBook.shelf='None';
-    else
-    {
-      console.log("shelf: " + item.shelf);
-      searchBook.shelf = item.shelf;
-    }
+  // inner end
+  if (searchBook.shelf === undefined || searchBook.shelf === ''){
+    searchBook.shelf = 'none';
+    book = searchBook;
   }
-  */
+  
 
- 
+  console.log("--------");
+  console.log(book);
+  console.log("--------");
+
+  return book;
+/** 
+  this.totalResArray.push(book);
+  console.log("--------");
+  console.log(this.totalResArray);
+  console.log("--------");
+
+  return this.totalResArray;
+
+  **/
+});
 
 render() {
   this.wantToReadBooks = this.state.books.filter(e => {

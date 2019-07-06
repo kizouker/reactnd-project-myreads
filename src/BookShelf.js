@@ -18,7 +18,8 @@ class BookShelf extends React.Component{
                   <ol className="books-grid">
                   <li>
                   { this.props.books.map((b) => {
-                   // console.log(this.props.books);
+                   console.log(this.props.books);
+                   console.log(b);
                     return(<GenerateBook key={b.id} bookTitle={b.title} bookAuthors={b.authors}
                                   imageLinks={b.imageLinks} id={b.id} shelf={b.shelf} 
                                   books={this.props.books} readingState={this.props.readingState} 
