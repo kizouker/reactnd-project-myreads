@@ -90,37 +90,39 @@ searchBook(searchString){
  // how do I know if there is a search result when the compare fn is executed?
 
   let promise = BooksAPI.search(searchString);
-  promise.then(res => {
+  let res;
+ promise.then(res => {
 
     console.log ("--- res ---");
     console.log(res);
     console.log ("--- res ---");
 
-    if (res !== undefined || res.length !==0 ){
-     // this.setState({ searchResult : res});
+    if (!(res === undefined) && Array.isArray(res) && (!(res.length === 0)))
+    {
       let summa = this.compare(res); // will be called when the containing callback fn is called
-       if (summa !== undefined || summa.length!==0){
+      if (!(summa === undefined) && Array.isArray(summa) && (!(summa.length === 0))){
          console.log(summa);
+         summa.map(item => {
+          console.log(item.shelf);
+         });
          this.setState({searchResult : summa});
+      } else {
+        this.setState({searchResult : []});
       }
-    
     } else {
-      this.setState({searchResult : []});
+      res = [];
+      this.setState({searchResult : res});
     } 
       return res;
-       /**                   
-        let summ2 = summa.filter(item => {
-         return item !== undefined;
-        })                   
-        console.log("cmp");
-        console.log(summ2);
-        console.log("-----");
-        
-        return res;         
-*/  
+         
   },(data) => {
     return data;
-  });
+  }).catch(error => {
+      alert(error)
+      res = [];
+      this.setState({searchResult : res});
+  }
+    ) ;
  // console.log ("searchresult:")
  // console.log(this.state.searchResult);
  // console.log ("searchresult:")
@@ -156,17 +158,17 @@ this.addItem(book);
 }
 
 compare =  (searchresult) => searchresult.map(searchBook => { 
-  let book = "";
+  let book = searchBook;
    this.state.books.map(allBook => {
     if (allBook.id === searchBook.id){
       searchBook.shelf = allBook.shelf;
-      book = searchBook;
     }
   });
   // inner end
+
+  //searchbook is not in my books
   if (searchBook.shelf === undefined || searchBook.shelf === ''){
-    searchBook.shelf = 'none';
-    book = searchBook;
+    book.shelf = 'none';
   }
   
 
