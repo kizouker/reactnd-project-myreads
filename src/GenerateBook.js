@@ -10,14 +10,23 @@ class GenerateBook extends React.Component{
     super(props);
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
+
   }
   render(){
-
+    let imageLinksNotNull = () => {
+      if (this.props.imageLinks === undefined) {
+        return "";
+      } else {
+        return this.props.imageLinks.thumbnail;
+      }
+    }
+    
+// `url("${this.props.imageLinks.thumbnail}")`
     console.log("this.props: " + this.props);
     return(<div className="book">  
                 <div className="book-top">
                 <div className="book-cover" 
-                  style={{ width: 128, height: 193, backgroundImage: `url("${this.props.imageLinks.thumbnail}")`}}></div>
+                  style={{ width: 128, height: 193, backgroundImage: `url("{$this.imageLinksNotNull}")` }}></div>
                   <BookShelfChanger readingState={this.props.readingState} changeShelf={this.props.changeShelf}
                   bookId={this.props.id}></BookShelfChanger> 
                   </div>                
