@@ -92,7 +92,7 @@ searchBook(searchString){
   let promise = BooksAPI.search(searchString);
   let res;
  promise.then(res => {
-
+    
     console.log ("--- res ---");
     console.log(res);
     console.log ("--- res ---");
@@ -100,12 +100,15 @@ searchBook(searchString){
     if (!(res === undefined) && Array.isArray(res) && (!(res.length === 0)))
     {
       let summa = this.compare(res); // will be called when the containing callback fn is called
-      if (!(summa === undefined) && Array.isArray(summa) && (!(summa.length === 0))){
+      if (!(summa === undefined) && Array.isArray(summa) 
+        && (!(summa.length === 0))){
          console.log(summa);
          summa.map(item => {
           console.log(item.shelf);
          });
          this.setState({searchResult : summa});
+         // error here: not empty, array, osv
+
       } else {
         this.setState({searchResult : []});
       }
@@ -158,25 +161,25 @@ this.addItem(book);
 }
 
 compare =  (searchresult) => searchresult.map(searchBook => { 
-  let book = searchBook;
+ // let book = searchBook;
    this.state.books.map(allBook => {
     if (allBook.id === searchBook.id){
       searchBook.shelf = allBook.shelf;
     }
-  });
+    });
   // inner end
 
   //searchbook is not in my books
   if (searchBook.shelf === undefined || searchBook.shelf === ''){
-    book.shelf = 'none';
+    searchBook.shelf = 'none';
   }
   
 
   console.log("--------");
-  console.log(book);
+  console.log(searchBook);
   console.log("--------");
 
-  return book;
+  return searchBook;
 /** 
   this.totalResArray.push(book);
   console.log("--------");

@@ -75,7 +75,7 @@ render(){
               console.log("----------");
               console.log(item.shelf);
               console.log(item.description);
-              console.log(item.books);
+   //  console.log(item.books);
               console.log("----------");
                 return (<BookShelf books={item.books} readingState={item.shelf} 
                         shelfDescription={item.description}
