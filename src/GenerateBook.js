@@ -5,28 +5,36 @@ import { throwStatement } from '@babel/types';
 
 
 class GenerateBook extends React.Component{
-
   constructor(props){
     super(props);
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
-
   }
-  render(){
-    let imageLinksNotNull = () => {
-      if (this.props.imageLinks === undefined) {
-        return "";
-      } else {
-        return this.props.imageLinks.thumbnail;
-      }
+
+  stylish = () => {
+    let urlValue;
+    console.log ("asDFASDFASDF");      
+    if (this.props.imageLinks === undefined) {
+      console.log("imgagelink null");
+      urlValue = "`url(" +  ")`";        
+    } else {
+      console.log("imgagelink :" + this.props.imageLinks.thumbnail);
+      urlValue = "`url(" + this.props.imageLinks.thumbnail + ")`";
     }
-    
-// `url("${this.props.imageLinks.thumbnail}")`
-    console.log("this.props: " + this.props);
+
+    const style = {
+      width: 128, 
+      height: 193, 
+      backgroundImage : `url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Logo_BILD.svg/1200px-Logo_BILD.svg.png")`
+    };
+    return style;
+  }
+  
+  render(){
     return(<div className="book">  
                 <div className="book-top">
                 <div className="book-cover" 
-                  style={{ width: 128, height: 193, backgroundImage: `url("{$this.imageLinksNotNull}")` }}></div>
+                  style={this.stylish}></div>
                   <BookShelfChanger readingState={this.props.readingState} changeShelf={this.props.changeShelf}
                   bookId={this.props.id}></BookShelfChanger> 
                   </div>                

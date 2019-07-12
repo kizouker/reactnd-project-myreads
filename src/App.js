@@ -11,7 +11,6 @@ class BooksApp extends React.Component {
     this.addItem = this.addItem.bind(this);
     this.searchBook = this.searchBook.bind(this);
     this.compare = this.compare.bind(this);
-    
   }
   state = {
     /**
@@ -86,51 +85,37 @@ componentDidMount(){
 }
 
 searchBook(searchString){
- // console.log ("search");
- // how do I know if this is a sync or async call?
- // how do I know if there is a search result when the compare fn is executed?
-
   let promise = BooksAPI.search(searchString);
   let res;
- promise.then(res => {
-    
-    console.log ("--- res ---");
-    console.log(res);
-    console.log ("--- res ---");
+  promise.then(res => {
+      
+      console.log ("--- res ---");
+      console.log(res);
+      console.log ("--- res ---");
 
-    if (!(res === undefined) && Array.isArray(res) && (!(res.length === 0)))
-    {
-      let summa = this.compare(res); // will be called when the containing callback fn is called
-      if (!(summa === undefined) && Array.isArray(summa) 
-        && (!(summa.length === 0))){
-         console.log(summa);
-         summa.map(item => {
-          console.log(item.shelf);
-         });
-         this.setState({searchResult : summa});
-         // error here: not empty, array, osv
-
+      if (!(res === undefined) && Array.isArray(res) && (!(res.length === 0)))
+      {
+        let summa = this.compare(res); 
+        if (!(summa === undefined) && Array.isArray(summa) 
+          && (!(summa.length === 0))){    
+          this.setState({searchResult : summa});      
+        } else {
+          this.setState({searchResult : []});
+        }
       } else {
-        this.setState({searchResult : []});
-      }
-    } else {
-      res = [];
-      this.setState({searchResult : res});
-    } 
-      return res;
-         
-  },(data) => {
-    return data;
-  }).catch(error => {
-      alert(error)
-      res = [];
-      this.setState({searchResult : res});
-  }
-    ) ;
- // console.log ("searchresult:")
- // console.log(this.state.searchResult);
- // console.log ("searchresult:")
-}
+        res = [];
+        this.setState({searchResult : res});
+      } 
+        return res;        
+    },(data) => {
+      return data;
+    }).catch(error => {
+        alert(error)
+        res = [];
+        this.setState({searchResult : res});
+    }
+  );
+ }
 
 removeBook = (bookId) => {
 //console.log("remove book id: "+ bookId + " title: ");
@@ -138,15 +123,13 @@ this.setState(prevState => ({books: this.state.books.filter(book => {
   return book.id !== bookId
   })}
 ))
-//console.log("remove id end");
 }
 
 addItem = (book) => {
   //console.log("add item id: "+ book.id + " title: "+ book.title);
   this.setState(oldState => ({
     books : [...oldState.books,  book]
-  }))
-//console.log("End additem");
+ }))
 }
       
 changeShelf = (bookId, shelf) => {
@@ -158,11 +141,9 @@ book.shelf = shelf;
 
 this.removeBook(book.id);
 this.addItem(book);
-//console.log("changeShelf end");
 }
 
 compare =  (searchresult) => searchresult.map(searchBook => { 
- // let book = searchBook;
    this.state.books.map(allBook => {
     if (allBook.id === searchBook.id){
       searchBook.shelf = allBook.shelf;
@@ -175,21 +156,11 @@ compare =  (searchresult) => searchresult.map(searchBook => {
     searchBook.shelf = 'none';
   }
   
-
   console.log("--------");
   console.log(searchBook);
   console.log("--------");
 
   return searchBook;
-/** 
-  this.totalResArray.push(book);
-  console.log("--------");
-  console.log(this.totalResArray);
-  console.log("--------");
-
-  return this.totalResArray;
-
-  **/
 });
 
 render() {
@@ -229,12 +200,7 @@ render() {
           </div>
           <div className="list-books-content">
             <div>
-            {this.readingStates.map(item => {
-              //console.log("----------");
-              //console.log(item.shelf);
-              //console.log(item.description);
-              //console.log(item.books);
-              
+            {this.readingStates.map(item => {              
                 return (<BookShelf books={item.books} readingState={item.shelf} 
                         shelfDescription={item.description} removeBook={this.removeBook} 
                         changeShelf={this.changeShelf}> 
