@@ -16,16 +16,17 @@ class GenerateBook extends React.Component{
     console.log ("asDFASDFASDF");      
     if (this.props.imageLinks === undefined) {
       console.log("imgagelink null");
-      urlValue = "`url(" +  ")`";        
+      urlValue = `url()`;        
     } else {
       console.log("imgagelink :" + this.props.imageLinks.thumbnail);
-      urlValue = "`url(" + this.props.imageLinks.thumbnail + ")`";
+      urlValue = `url(${this.props.imageLinks.thumbnail})`;
+      //urlValue = `url(` + this.props.imageLinks.thumbnail + `)`;
     }
 
     const style = {
       width: 128, 
       height: 193, 
-      backgroundImage : `url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Logo_BILD.svg/1200px-Logo_BILD.svg.png")`
+      backgroundImage : urlValue
     };
     return style;
   }
@@ -34,9 +35,9 @@ class GenerateBook extends React.Component{
     return(<div className="book">  
                 <div className="book-top">
                 <div className="book-cover" 
-                  style={this.stylish}></div>
+                  style={this.stylish()}></div>
                   <BookShelfChanger readingState={this.props.readingState} changeShelf={this.props.changeShelf}
-                  bookId={this.props.id}></BookShelfChanger> 
+                  bookId={this.props.id} shelf={this.props.shelf}></BookShelfChanger> 
                   </div>                
                 <div className="book-title">{this.props.bookTitle}</div>
                 <div className="book-authors">{this.props.bookAuthors}</div>

@@ -8,9 +8,7 @@ class SearchField extends React.Component{
     this.handleChange = this.handleChange.bind(this);
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
-    this.compare = this.props.compare.bind(this);
-  
-   
+    this.compare = this.props.compare.bind(this);  
   }
 
 wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
@@ -75,7 +73,7 @@ render(){
               console.log("----------");
               console.log(item.shelf);
               console.log(item.description);
-   //  console.log(item.books);
+              //  console.log(item.books);
               console.log("----------");
                 return (<BookShelf books={item.books} readingState={item.shelf} 
                         shelfDescription={item.description}

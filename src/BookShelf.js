@@ -8,7 +8,6 @@ class BookShelf extends React.Component{
     super(props);
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
-
   }
     render(){  
       return( 

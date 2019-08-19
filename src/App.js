@@ -143,12 +143,12 @@ this.removeBook(book.id);
 this.addItem(book);
 }
 
-compare =  (searchresult) => searchresult.map(searchBook => { 
+compare = (searchresult) => searchresult.map(searchBook => { 
    this.state.books.map(allBook => {
     if (allBook.id === searchBook.id){
       searchBook.shelf = allBook.shelf;
     }
-    });
+});
   // inner end
 
   //searchbook is not in my books
@@ -188,11 +188,12 @@ render() {
    
     return (
     <div className="app">
-      {this.state.showSearchPage ? (<SearchField state={this.state} searchBook={this.searchBook} 
-                                                 readingStates={this.readingStates}
-                                                 removeBook={this.removeBook} 
-                                                 changeShelf={this.changeShelf}
-                                                 compare={this.compare}>
+      {this.state.showSearchPage ? (<SearchField 
+                                      state={this.state} searchBook={this.searchBook} 
+                                      readingStates={this.readingStates}
+                                      removeBook={this.removeBook} 
+                                      changeShelf={this.changeShelf}
+                                      compare={this.compare}>
                                     </SearchField>):(
         <div className="list-books">
           <div className="list-books-title">
@@ -202,9 +203,9 @@ render() {
             <div>
             {this.readingStates.map(item => {              
                 return (<BookShelf books={item.books} readingState={item.shelf} 
-                        shelfDescription={item.description} removeBook={this.removeBook} 
-                        changeShelf={this.changeShelf}> 
-                      </BookShelf>)
+                          shelfDescription={item.description} removeBook={this.removeBook} 
+                          changeShelf={this.changeShelf}> 
+                        </BookShelf>)
               })}               
             </div>
           </div>

@@ -8,12 +8,12 @@ class GenerateBooks extends React.Component{
       super(props);
     }
     
-changeShelf = (bookId, newshelf) => {
-    //this.setState({books : })
-    this.state.books.filter (b => {
-        return b.id === bookId;
-    })
-}
+// changeShelf = (bookId, newshelf) => {
+//     //this.setState({books : })
+//     this.state.books.filter (b => {
+//         return b.id === bookId;
+//     })
+// }
 
 render(){
     return(<ol className="books-grid">
