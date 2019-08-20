@@ -1,8 +1,6 @@
 import React from 'react';
 import './App.css';
 import BookShelfChanger from './BookShelfChanger';
-import { throwStatement } from '@babel/types';
-
 
 class GenerateBook extends React.Component{
   constructor(props){

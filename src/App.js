@@ -3,7 +3,6 @@ import './App.css';
 import SearchField from './SearchField';
 import BookShelf from './BookShelf';
 import * as BooksAPI from './BooksAPI';
-import { isUpdateExpression } from '@babel/types';
       
 class BooksApp extends React.Component {
   constructor(props){
@@ -144,18 +143,18 @@ this.addItem(book);
 }
 
 compare = (searchresult) => searchresult.map(searchBook => { 
-   this.state.books.map(allBook => {
-    if (allBook.id === searchBook.id){
-      searchBook.shelf = allBook.shelf;
-    }
-});
-  // inner end
-
-  //searchbook is not in my books
+  this.state.books.map(allBook => {
+      if (allBook.id === searchBook.id){
+          searchBook.shelf = allBook.shelf;
+        }
+      return null;
+      });
+  
+  // Inner 
+  // searchbook is not in my books
   if (searchBook.shelf === undefined || searchBook.shelf === ''){
     searchBook.shelf = 'none';
   }
-  
   console.log("--------");
   console.log(searchBook);
   console.log("--------");
@@ -201,10 +200,11 @@ render() {
           </div>
           <div className="list-books-content">
             <div>
-            {this.readingStates.map(item => {              
-                return (<BookShelf books={item.books} readingState={item.shelf} 
+            {this.readingStates.map(item => { 
+                return (<BookShelf key={item.shelf} books={item.books} readingState={item.shelf} 
                           shelfDescription={item.description} removeBook={this.removeBook} 
-                          changeShelf={this.changeShelf}> 
+                          changeShelf={this.changeShelf}
+                          > 
                         </BookShelf>)
               })}               
             </div>
