@@ -1,6 +1,10 @@
 import React from 'react';
 import './App.css';
 import BookShelf from './BookShelf';
+import NotFound from './NotFound.js';
+import ls from 'local-storage'
+
+const ALL_BOOKS = "allbooks";
 
 class SearchField extends React.Component{
   constructor(props){
@@ -8,83 +12,71 @@ class SearchField extends React.Component{
     this.handleChange = this.handleChange.bind(this);
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
-    this.compare = this.props.compare.bind(this);  
+    this.compare = this.props.compare.bind(this);
   }
 
 wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
 
 handleChange = (event) => {
-// console.log("value: " + event.target.value);
- 
-  this.props.searchBook(event.target.value);
- // this.props.compare();
+  let searchString= event.target.value;
+  this.props.updateSearchQuery(searchString);
+  this.props.searchBook(searchString);
 }
+
 render(){
-  this.wantToReadBooks = this.props.state.searchResult.filter(e => {
+  let allbooks = ls.get(ALL_BOOKS);
+  this.wantToReadBooks = allbooks.filter(e => {
     return e.shelf === "wantToRead"});
     
-    this.currentlyReadingBooks = this.props.state.searchResult.filter(e => {
-    return e.shelf === "currentlyReading"});
+  this.currentlyReadingBooks = allbooks.filter(e => {
+  return e.shelf === "currentlyReading"});
     
-    this.readBooks = this.props.state.searchResult.filter(e => {
-    return e.shelf === "read"});
+  this.readBooks = allbooks.filter(e => {
+  return e.shelf === "read"});
     
-    this.none = this.props.state.searchResult.filter(e => {
-      return e.shelf === "none"});
+  this.none = allbooks.filter(e => {
+    return e.shelf === "none"});
 
-  this.readingStates =  [{ shelf : "currentlyReading",  
+  this.readingStates = [
+                    { shelf : "currentlyReading",  
                       description : "Currently Reading",
-                      books: this.currentlyReadingBooks
+                      mybooks: this.currentlyReadingBooks
                     },
                     { shelf: "wantToRead", 
                       description : "Want to Read",
-                      books: this.wantToReadBooks
+                      mybooks: this.wantToReadBooks
                     },
                     { shelf : "read",  
                       description : "Read", 
-                      books: this.readBooks,
+                      mybooks: this.readBooks,
                     },
                     { shelf : "none",  
                       description : "None", 
-                      books: this.none
+                      mybooks: this.none
                     }];
 
-  return( <div className="search-books">
-              <div className="search-books-bar">
-                <button className="close-search" 
-                onClick={() => this.setState({ showSearchPage: false })}>Close</button>
-                <div className="search-books-input-wrapper">
-                  {/*
-                    NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                    You can find these search terms here:
-                    https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-
-                    However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                    you don't find a specific author or title. Every search is limited by search terms.
-                  */}
-                  <input type="text" placeholder="Search by title or author" 
-                  onChange={e => this.handleChange(e)}/>
-                </div>
-              </div>
-                <div className="search-books-results">
-
-                <div>
-            {this.readingStates.map(item => {
-              console.log("----------");
-              console.log(item.shelf);
-              console.log(item.description);
-              //  console.log(item.books);
-              console.log("----------");
-                return (<BookShelf books={item.books} readingState={item.shelf} 
-                        shelfDescription={item.description}
-                        removeBook={this.props.removeBook} changeShelf={this.props.changeShelf}> 
-                      </BookShelf>)
-              })}               
+  return(<div>
+            <div className="search-books">
+                  <div className="search-books-bar">
+                      <input type="text" placeholder="Search by title or author" 
+                              value={this.props.state.searchQuery}
+                              onChange={e => this.handleChange(e)}/>
+                  </div>
             </div>
-                 
-              </div>
-          </div>
-  );
+            <div className="search-books-results">
+              <div>
+                {this.readingStates.map(item => {
+                    return (<BookShelf key={item.shelf}
+                              mybooks={item.mybooks} 
+                              readingState={item.shelf} 
+                              shelfDescription={item.description}
+                              removeBook={this.props.removeBook} 
+                              changeShelf={this.props.changeShelf}> 
+                            </BookShelf>)})
+                  }               
+              </div>         
+            </div>
+          </div>);
   }
 }
 

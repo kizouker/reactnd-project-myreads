@@ -5,20 +5,21 @@ import BookShelfChanger from './BookShelfChanger';
 class GenerateBook extends React.Component{
   constructor(props){
     super(props);
-    this.changeShelf = this.props.changeShelf.bind(this);
+   // this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
+  }
+
+  changeShelf = (bookId, shelf) => {
+    //this.forceUpdate();
+    this.props.changeShelf(bookId, shelf);
   }
 
   stylish = () => {
     let urlValue;
-    console.log ("asDFASDFASDF");      
     if (this.props.imageLinks === undefined) {
-      console.log("imgagelink null");
       urlValue = `url()`;        
     } else {
-      console.log("imgagelink :" + this.props.imageLinks.thumbnail);
       urlValue = `url(${this.props.imageLinks.thumbnail})`;
-      //urlValue = `url(` + this.props.imageLinks.thumbnail + `)`;
     }
 
     const style = {
@@ -32,19 +33,23 @@ class GenerateBook extends React.Component{
   render(){
     return(<div className="book">  
                 <div className="book-top">
-                <div className="book-cover" 
-                  style={this.stylish()}></div>
-                  <BookShelfChanger readingState={this.props.readingState} changeShelf={this.props.changeShelf}
-                  bookId={this.props.id} shelf={this.props.shelf}></BookShelfChanger> 
-                  </div>                
+                  <div className="book-cover" 
+                    style={this.stylish()} alt={this.props.bookTitle}>
+                  </div>
+                  <BookShelfChanger readingState={this.props.readingState} 
+                    changeShelf={this.changeShelf}
+                    bookId={this.props.id} shelf={this.props.shelf}>
+                  </BookShelfChanger> 
+                </div> 
+                               
                 <div className="book-title">{this.props.bookTitle}</div>
                 <div className="book-authors">{this.props.bookAuthors}</div>
-                <div className="book-ID">{this.props.id}</div>
+                <div className="book-ID">ID: {this.props.id}</div>
                 
                 <button onClick={e => this.props.removeBook(this.props.id, e )}>
                   Remove book
                 </button>
-                </div>)
-  }
+            </div>)
+          }
 }
 export default GenerateBook;
