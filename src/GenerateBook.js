@@ -6,7 +6,6 @@ class GenerateBook extends React.Component{
   constructor(props){
     super(props);
     this.changeShelf = this.props.changeShelf.bind(this);
-    this.removeBook = this.props.removeBook.bind(this);
   }
   
   stylish = () => {
@@ -41,10 +40,6 @@ class GenerateBook extends React.Component{
                 <div className="book-title">{this.props.bookTitle}</div>
                 <div className="book-authors">{this.props.bookAuthors}</div>
                 <div className="book-ID">ID: {this.props.id}</div>
-                
-                <button onClick={e => this.props.removeBook(this.props.id, e )}>
-                  Remove book
-                </button>
             </div>)
           }
 }

@@ -7,7 +7,6 @@ class BookShelf extends React.Component{
   constructor(props){
     super(props);
     this.changeShelf = this.props.changeShelf.bind(this);
-    this.removeBook = this.props.removeBook.bind(this);
   }
 
     render(){  
@@ -23,7 +22,6 @@ class BookShelf extends React.Component{
                     return( <GenerateBook key={b.id} bookTitle={b.title} bookAuthors={b.authors}
                                         imageLinks={b.imageLinks} id={b.id} book={b} shelf={b.shelf} 
                                         mybooks={this.props.mybooks} readingState={this.props.readingState} 
-                                        removeBook={this.props.removeBook}
                                         changeShelf={this.changeShelf} 
                                         location={this.props.location}>
                             </GenerateBook>)   

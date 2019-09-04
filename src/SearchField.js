@@ -2,37 +2,25 @@ import React from 'react';
 import './App.css';
 import BookShelf from './BookShelf';
 import ls from 'local-storage'
-
-const ALL_BOOKS = "allbooks";
-
+import {ALL_BOOKS} from './constants.js'
 
 class SearchField extends React.Component{
   constructor(props){
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.changeShelf = this.props.changeShelf.bind(this);
-    this.removeBook = this.props.removeBook.bind(this);
-
-
     // create a ref to store the textInput DOM element
     this.textInput = React.createRef();
-
     this.focusTextInput = this.focusTextInput.bind(this);
   }
 
 wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
 
-
-
 componentDidMount(){
-
-this.focusTextInput();
-
-
+  this.focusTextInput();
 }
 
 focusTextInput = () => {
-
   // Explicitly focus the text input using the raw DOM API
    // Note: we're accessing "current" to get the DOM node
    this.textInput.current.focus();
@@ -44,10 +32,8 @@ handleChange = (event) => {
 }
 
 render(){
+  console.log(this.props.location);
   let allbooks = ls.get(ALL_BOOKS);
-
-    console.log("   location:"  );
-    console.log(this.props.location );
 
   this.wantToReadBooks = allbooks.filter(e => {
     return e.shelf === "wantToRead"});
@@ -62,23 +48,23 @@ render(){
     return e.shelf === "none"});
 
   this.readingStates = [
-                    { shelf : "currentlyReading",  
-                      description : "Currently Reading",
-                      mybooks: this.currentlyReadingBooks
-                    },
-                    { shelf: "wantToRead", 
-                      description : "Want to Read",
-                      mybooks: this.wantToReadBooks
-                    },
-                    { shelf : "read",  
-                      description : "Read", 
-                      mybooks: this.readBooks,
-                    },
-                    { shelf : "none",  
-                      description : "None", 
-                      mybooks: this.none
-                    }];
-//    
+    { shelf : "currentlyReading",  
+      description : "Currently Reading",
+      mybooks: this.currentlyReadingBooks
+    },
+    { shelf: "wantToRead", 
+      description : "Want to Read",
+      mybooks: this.wantToReadBooks
+    },
+    { shelf : "read",  
+      description : "Read", 
+      mybooks: this.readBooks,
+    },
+    { shelf : "none",  
+      description : "None", 
+      mybooks: this.none}
+  ];
+
   return(<div>
             <div className="search-books">
                   <div className="search-books-bar">
@@ -96,7 +82,6 @@ render(){
                               mybooks={item.mybooks} 
                               readingState={item.shelf} 
                               shelfDescription={item.description}
-                              removeBook={this.props.removeBook} 
                               changeShelf={this.props.changeShelf}
                               location={this.props.location}> 
                             </BookShelf>)})

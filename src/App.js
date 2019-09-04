@@ -5,12 +5,7 @@ import BookShelf from './BookShelf';
 import * as BooksAPI from './BooksAPI';
 import { Route,  Link } from 'react-router-dom'
 import ls from 'local-storage'
-
-
-
-const MY_BOOKS = "mybooks";
-const ALL_BOOKS ="allbooks"
-
+import {MY_BOOKS, ALL_BOOKS} from './constants.js'
 
 class BooksApp extends React.Component {
   constructor(props){
@@ -21,21 +16,17 @@ class BooksApp extends React.Component {
         mybooks: [],
         allBooks : []
     };
-
-    this.removeBook = this.removeBook.bind(this);
     this.searchBook = this.searchBook.bind(this);
     this.changeShelf = this.changeShelf.bind(this);
     this.checkNotEmptyArray = this.checkNotEmptyArray.bind(this);    
     this.sortIntoShelves = this.sortIntoShelves.bind(this);
-
-    //Init to empty array
-   // ls.set(MY_BOOKS, []);
-    ls.set(ALL_BOOKS, []);
   }
-  
-wantToReadBooks; currentlyReadingBooks; readBooks = []; 
-readingStates = [];
-totalResArray = [];
+
+  currentlyReadingBooks = []; 
+  wantToReadBooks = []; 
+  readBooks = []; 
+  readingStates = [];
+  totalResArray = [];
 
 /**
  * @description: Checks if the argument is an array, is not undefined,
@@ -60,13 +51,6 @@ checkNotEmptyArray = (arg) => {
  * is available to the DOM. 
  */
 
-
-componentDidUpdate(prevProps, prevState, snapshot){
-
-  const locationChanged = prevProps.location !== this.props.location;
-  console.log("currentLocation "+ locationChanged);
- 
-}
 componentDidMount(){
   let promise = BooksAPI.getAll();
 
@@ -103,14 +87,8 @@ changeShelf = (book, shelf, location) => {
   let myBooks = ls.get(MY_BOOKS);
   let allBooks = ls.get(ALL_BOOKS);      
 
-// we are in the search...
-
-console.log("l")
-console.log(location)
-console.log("l")
-
-
- if (location !== undefined){
+// we are on the search page ...
+ if (location!==undefined && location.pathname.includes("search")){
  //Change the book on the search page
  // find it amongst the search result  
       //alert ("New book added to my collection");  
@@ -123,7 +101,6 @@ console.log("l")
         ls.set(ALL_BOOKS, allBooks);
       }
     }
- 
     //change the shelf
     myBooks = this.justInTimeReplacement(myBooks, book, shelf);
      // Always change the shelf - and update
@@ -131,9 +108,16 @@ console.log("l")
     this.setState({mybooks : myBooks});
     // update the local storage 
     ls.set(MY_BOOKS, myBooks);
-
 } 
 
+/**
+ * @description: Changes the shelf of a book and adds the book to an array 
+ * if the element already exists it is replaced.
+ * @param {array} inarray - the current list of books
+ * @param {object} item - the book item to be added/changed
+ * @param {shelf} shelf - the shelf
+ * @returns - returns the changed array
+ */
 justInTimeReplacement = (inarray, item, shelf ) => {
   let foundIndex = inarray.findIndex(e => e.id === item.id)
 
@@ -146,39 +130,11 @@ justInTimeReplacement = (inarray, item, shelf ) => {
   return inarray
 }
 
-
 /**
- * @description: Removes a book from state variable and from the local-storage
- * @param {string} bookId - the book to be removed
- * @returns - nothing
- */
-removeBook = (bookId) => {
-  // get my books for the local storage
-  let myBooks = ls.get(MY_BOOKS);
-  //let allBooks = ls.get(ALL_BOOKS);
-  // allBooks = this.sortIntoShelves(allBooks);
-
-  // filter out everyone except the selected book
-  let filtMyBooks = myBooks.filter(book => {
-    return book.id !== bookId
-  });
-
-  // let filtAllBooks= allBooks.filter(book => {
-  //   return book.id !== bookId
-  // });
-  // setstate - is async - and state updates are bundled - 
-  // so checking state after a setstate doesn't work so well
- this.setState({mybooks: filtMyBooks});
- //this.setState({searchResult : allBooks}); 
-  // update the local storage     
-  ls.set(MY_BOOKS, filtMyBooks);
- // ls.set(ALL_BOOKS, filtAllBooks);
-}
-
-/**
- * @description: Adds a book to state variable and to the local-storage
- * @param {string} book - the book to be added
- * @returns - nothing
+ * @description: Search for a books using external api. 
+ * State variable and local-storage are updated
+ * @param {string} searchString - the search string for books
+ * @returns - search result
  */
 searchBook(searchString){
   let promise = BooksAPI.search(searchString);
@@ -189,7 +145,6 @@ if (this.checkNotEmptyArray(res)){
         if(this.checkNotEmptyArray(shelfSortedSearch)){    
           ls.set(ALL_BOOKS, shelfSortedSearch);
           this.setState({allBooks : shelfSortedSearch});
-          
         } else {
           ls.set(ALL_BOOKS, []);
           this.setState({allBooks : []});
@@ -209,10 +164,22 @@ if (this.checkNotEmptyArray(res)){
   );
  }
 
+ /**
+ * @description: Updates the searchstring - saves it so it persists
+ * @param {string} searchString - the search string for books
+ * @returns - nothing
+ */
 updateSearchQuery = (searchString) => {
   this.setState({searchQuery : searchString});
 }
 
+ /**
+ * @description: Sorts books from the search result based on what the user
+ * already possess. 
+ * 
+ * @param {string} searchresult - the search string for books
+ * @returns - nothing
+ */
 sortIntoShelves = (searchresult) => searchresult.map(newBook => { 
   this.state.mybooks.map(mybook => {
       if (mybook.id === newBook.id){
@@ -229,13 +196,10 @@ sortIntoShelves = (searchresult) => searchresult.map(newBook => {
       });
 
 render() {
-
   // is state really updated? can I rely on that?
 
   let inputSource = this.state.mybooks;
-  //let inputSource = this.state.mybooksU.book;
   
-
   this.wantToReadBooks = inputSource.filter(e => {
   return e.shelf === "wantToRead"});
   
@@ -245,18 +209,20 @@ render() {
   this.readBooks = inputSource.filter(e => {
   return e.shelf === "read"});
   
-  this.readingStates =  [{ shelf : "currentlyReading",  
-                      description : "Currently Reading",
-                      mybooks: this.currentlyReadingBooks
-                    },
-                    { shelf: "wantToRead", 
-                      description : "Want to Read",
-                      mybooks: this.wantToReadBooks
-                    },
-                    { shelf : "read",  
-                      description : "Read", 
-                      mybooks: this.readBooks
-                    }];  
+  this.readingStates = [
+    { shelf : "currentlyReading",  
+      description : "Currently Reading",
+      mybooks: this.currentlyReadingBooks
+    },
+    { shelf: "wantToRead", 
+      description : "Want to Read",
+      mybooks: this.wantToReadBooks
+    },
+    { shelf : "read",  
+      description : "Read", 
+      mybooks: this.readBooks
+    }
+    ];  
    
     return (
     <div className="app">  
@@ -270,38 +236,26 @@ render() {
               </li>
           </ul>
           <hr />
-            <Route exact path="/search" component={(props) =><SearchField 
+          <hr />
+            <Route exact path="/search" render={(props) => (<SearchField 
                                                                 state={this.state} 
                                                                 searchBook={this.searchBook} 
-                                                                removeBook={this.removeBook} 
                                                                 changeShelf={this.changeShelf}
                                                                 updateSearchQuery={this.updateSearchQuery}
                                                                 location = {this.props.location}
                                                                 {...props}>
-                                                            </SearchField>}/>
+                                                            </SearchField>
+                                                            )}/>
            <Route exact path="/" render={() => (
-
-             
                     <div className="list-books">
                     <div className="list-books-title">
                       <h1>MyReads</h1>
                     </div>
                       <div className="list-books-content">
                         <div>
-                          {
-
-                     
-                      console.log(this.props.location )
-                                                }
-
-                          {ls.set(ALL_BOOKS, [])}
-                        {
-                      //  console.log("location:" +this.props.location )
-                        }
-                          {this.readingStates.map(item => { 
+                        {this.readingStates.map(item => { 
                           return (<BookShelf key={item.shelf} mybooks={item.mybooks} readingState={item.shelf} 
-                                      shelfDescription={item.description} removeBook={this.removeBook} 
-                                      changeShelf={this.changeShelf} > 
+                                      shelfDescription={item.description} changeShelf={this.changeShelf} > 
                                   </BookShelf>)
                           })}               
                         </div>
