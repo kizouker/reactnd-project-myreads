@@ -9,12 +9,13 @@ class BookShelfChanger extends React.Component{
     }
     this.handleChange = this.handleChange.bind(this);
     this.state.value = this.props.shelf;
+    this.changeShelf = this.props.changeShelf.bind(this);
   }
 
   handleChange(event) {
     const target = event.target;
     const bookShelf = target.value;
-    this.props.changeShelf(this.props.bookId, bookShelf);
+    this.changeShelf(this.props.book, bookShelf, this.props.location);
     this.setState({value: event.target.value});
    }  
  

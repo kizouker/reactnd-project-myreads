@@ -3,28 +3,34 @@ import './App.css';
 import SearchField from './SearchField';
 import BookShelf from './BookShelf';
 import * as BooksAPI from './BooksAPI';
-import NotFound from './NotFound.js';
 import { Route,  Link } from 'react-router-dom'
 import ls from 'local-storage'
+
+
 
 const MY_BOOKS = "mybooks";
 const ALL_BOOKS ="allbooks"
 
+
 class BooksApp extends React.Component {
   constructor(props){
-
     super(props);
     this.state = {
-        searchQuery : '',     
-        searchResult: [],
+        searchQuery : '',     // running refresh in the the browser 
+        searchResult: [],     // => runs the constructor again
         mybooks: [],
         allBooks : []
     };
-    this.addItem = this.addItem.bind(this);
+
+    this.removeBook = this.removeBook.bind(this);
     this.searchBook = this.searchBook.bind(this);
-    this.compare = this.compare.bind(this);
     this.changeShelf = this.changeShelf.bind(this);
     this.checkNotEmptyArray = this.checkNotEmptyArray.bind(this);    
+    this.sortIntoShelves = this.sortIntoShelves.bind(this);
+
+    //Init to empty array
+   // ls.set(MY_BOOKS, []);
+    ls.set(ALL_BOOKS, []);
   }
   
 wantToReadBooks; currentlyReadingBooks; readBooks = []; 
@@ -54,6 +60,13 @@ checkNotEmptyArray = (arg) => {
  * is available to the DOM. 
  */
 
+
+componentDidUpdate(prevProps, prevState, snapshot){
+
+  const locationChanged = prevProps.location !== this.props.location;
+  console.log("currentLocation "+ locationChanged);
+ 
+}
 componentDidMount(){
   let promise = BooksAPI.getAll();
 
@@ -69,9 +82,9 @@ componentDidMount(){
     if (this.checkNotEmptyArray(mybooks)){
       this.setState({mybooks : mybooks}); // If the list has been fetched before
                                           // and is in the local storage it is set
-                                          // in the state variable
+                                          // in the state variable                             
     } else {
-                                        // If the list has not been fetched before
+      // If the list has not been fetched before
       this.setState({mybooks : res});   // it is fetched from the API an stored in state
       ls.set(MY_BOOKS, res);            // ELSE, it is fetched from local-storage 
     } 
@@ -86,48 +99,53 @@ componentDidMount(){
  * @param {string} shelf - the Id of the book shelf to change to
  * @returns - doesn't return anything
  */
-changeShelf = (bookId, shelf) => {
+changeShelf = (book, shelf, location) => {
   let myBooks = ls.get(MY_BOOKS);
-  // Checks if the book is already in my book collection
-  let selectedBook = myBooks.find(book => {
-    return book.id === bookId
-  })
+  let allBooks = ls.get(ALL_BOOKS);      
 
-  // ...if it is, move it to the new shelf
-  if (selectedBook !== undefined){
-    selectedBook.shelf = shelf;
-    this.removeBook(selectedBook.id);
-    this.addItem(selectedBook);
-  } else {
-    alert ("New book added to my collection");  
-    let allBooks = ls.get(ALL_BOOKS);           
-                                                // If the book is not in my collection
-    selectedBook = allBooks.find(book => {      // find it amongst the search result
-        return book.id === bookId
-    })
+// we are in the search...
 
-  if (selectedBook !== undefined){
-    selectedBook.shelf = shelf;                 // ... update the shelf
-    this.addItem(selectedBook);                 // ... and add it to my collection
-    } 
-  }
-}
+console.log("l")
+console.log(location)
+console.log("l")
 
-/**
- * @description: Adds a book to state variable and to the local-storage
- * @param {string} book - the book to be added
- * @returns - nothing
- */
-addItem = (book) => {
-  // get my books for the local storage
-  let myBooks = ls.get(MY_BOOKS);
+
+ if (location !== undefined){
+ //Change the book on the search page
+ // find it amongst the search result  
+      //alert ("New book added to my collection");  
+      // ... and change the shelf of the searchresult
+      allBooks = this.justInTimeReplacement(allBooks, book, shelf);
+      if(allBooks.length !== 0 ){
+        //update state, triggers re-rendering
+        this.setState({allBooks : allBooks});
+        // update the local storage 
+        ls.set(ALL_BOOKS, allBooks);
+      }
+    }
  
-  myBooks = [...myBooks, book ]; // add the book to the list
-  //update state, triggers re-rendering
-  this.setState({mybooks : myBooks});
-  // update the local storage 
-  ls.set(MY_BOOKS, myBooks);
+    //change the shelf
+    myBooks = this.justInTimeReplacement(myBooks, book, shelf);
+     // Always change the shelf - and update
+    //update state, triggers re-rendering
+    this.setState({mybooks : myBooks});
+    // update the local storage 
+    ls.set(MY_BOOKS, myBooks);
+
+} 
+
+justInTimeReplacement = (inarray, item, shelf ) => {
+  let foundIndex = inarray.findIndex(e => e.id === item.id)
+
+  item.shelf = shelf;
+  if (foundIndex !== -1){ // the item is already in the array so
+    inarray.splice(foundIndex, 1, item); // ... replace the old item
+  } else{// the item is not already in the array
+    inarray.push(item); // Add the book to my collection
+  }
+  return inarray
 }
+
 
 /**
  * @description: Removes a book from state variable and from the local-storage
@@ -137,16 +155,24 @@ addItem = (book) => {
 removeBook = (bookId) => {
   // get my books for the local storage
   let myBooks = ls.get(MY_BOOKS);
+  //let allBooks = ls.get(ALL_BOOKS);
+  // allBooks = this.sortIntoShelves(allBooks);
+
   // filter out everyone except the selected book
-  myBooks = myBooks.filter(book => {
+  let filtMyBooks = myBooks.filter(book => {
     return book.id !== bookId
   });
 
+  // let filtAllBooks= allBooks.filter(book => {
+  //   return book.id !== bookId
+  // });
   // setstate - is async - and state updates are bundled - 
   // so checking state after a setstate doesn't work so well
- this.setState({mybooks: myBooks});
+ this.setState({mybooks: filtMyBooks});
+ //this.setState({searchResult : allBooks}); 
   // update the local storage     
-  ls.set(MY_BOOKS, myBooks);
+  ls.set(MY_BOOKS, filtMyBooks);
+ // ls.set(ALL_BOOKS, filtAllBooks);
 }
 
 /**
@@ -158,26 +184,27 @@ searchBook(searchString){
   let promise = BooksAPI.search(searchString);
   
   promise.then(res => {
-   //   if (this.checkNotEmptyArray(res))
-    if (!(res === undefined) && Array.isArray(res) && (!(res.length === 0)))
-      {
-        let summa = this.compare(res); 
-        if (!(summa === undefined) && Array.isArray(summa) 
-          && (!(summa.length === 0))){    
-          this.setState({searchResult : summa});   
-          ls.set(ALL_BOOKS, summa);
+if (this.checkNotEmptyArray(res)){
+        let shelfSortedSearch = this.sortIntoShelves(res); 
+        if(this.checkNotEmptyArray(shelfSortedSearch)){    
+          ls.set(ALL_BOOKS, shelfSortedSearch);
+          this.setState({allBooks : shelfSortedSearch});
+          
         } else {
-          this.setState({searchResult : []});
+          ls.set(ALL_BOOKS, []);
+          this.setState({allBooks : []});
         }
       } else {
-          this.setState({searchResult : []});
+          ls.set(ALL_BOOKS, []);
+          this.setState({allBooks : []});
       } 
         return res;        
     },(data) => {
         return data;
     }).catch(error => {
         alert(error)
-        this.setState({searchResult : []});
+        ls.set(ALL_BOOKS, []);
+        this.setState({allBooks : []});
     }
   );
  }
@@ -186,30 +213,36 @@ updateSearchQuery = (searchString) => {
   this.setState({searchQuery : searchString});
 }
 
-compare = (searchresult) => searchresult.map(searchBook => { 
-  this.state.mybooks.map(allBook => {
-      if (allBook.id === searchBook.id){
-          searchBook.shelf = allBook.shelf;
+sortIntoShelves = (searchresult) => searchresult.map(newBook => { 
+  this.state.mybooks.map(mybook => {
+      if (mybook.id === newBook.id){
+          newBook.shelf = mybook.shelf;
         }
-      return searchBook;
+        return newBook;
       });
   
-  // Inner 
-  // searchbook is not in my books
-  if (searchBook.shelf === undefined || searchBook.shelf === ''){
-    searchBook.shelf = 'none';
-  }
-    return searchBook;
-});
+      // newBook is not in my books
+      if (newBook.shelf === undefined || newBook.shelf === ''){
+        newBook.shelf = 'none';
+      }
+        return newBook;
+      });
 
 render() {
-  this.wantToReadBooks = this.state.mybooks.filter(e => {
+
+  // is state really updated? can I rely on that?
+
+  let inputSource = this.state.mybooks;
+  //let inputSource = this.state.mybooksU.book;
+  
+
+  this.wantToReadBooks = inputSource.filter(e => {
   return e.shelf === "wantToRead"});
   
-  this.currentlyReadingBooks = this.state.mybooks.filter(e => {
+  this.currentlyReadingBooks = inputSource.filter(e => {
   return e.shelf === "currentlyReading"});
   
-  this.readBooks = this.state.mybooks.filter(e => {
+  this.readBooks = inputSource.filter(e => {
   return e.shelf === "read"});
   
   this.readingStates =  [{ shelf : "currentlyReading",  
@@ -240,20 +273,31 @@ render() {
             <Route exact path="/search" component={(props) =><SearchField 
                                                                 state={this.state} 
                                                                 searchBook={this.searchBook} 
-                                                                readingStates={this.readingStates}
                                                                 removeBook={this.removeBook} 
                                                                 changeShelf={this.changeShelf}
-                                                                compare={this.compare}
                                                                 updateSearchQuery={this.updateSearchQuery}
+                                                                location = {this.props.location}
                                                                 {...props}>
                                                             </SearchField>}/>
            <Route exact path="/" render={() => (
+
+             
                     <div className="list-books">
                     <div className="list-books-title">
                       <h1>MyReads</h1>
                     </div>
                       <div className="list-books-content">
                         <div>
+                          {
+
+                     
+                      console.log(this.props.location )
+                                                }
+
+                          {ls.set(ALL_BOOKS, [])}
+                        {
+                      //  console.log("location:" +this.props.location )
+                        }
                           {this.readingStates.map(item => { 
                           return (<BookShelf key={item.shelf} mybooks={item.mybooks} readingState={item.shelf} 
                                       shelfDescription={item.description} removeBook={this.removeBook} 

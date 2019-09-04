@@ -5,15 +5,10 @@ import BookShelfChanger from './BookShelfChanger';
 class GenerateBook extends React.Component{
   constructor(props){
     super(props);
-   // this.changeShelf = this.props.changeShelf.bind(this);
+    this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
   }
-
-  changeShelf = (bookId, shelf) => {
-    //this.forceUpdate();
-    this.props.changeShelf(bookId, shelf);
-  }
-
+  
   stylish = () => {
     let urlValue;
     if (this.props.imageLinks === undefined) {
@@ -37,8 +32,9 @@ class GenerateBook extends React.Component{
                     style={this.stylish()} alt={this.props.bookTitle}>
                   </div>
                   <BookShelfChanger readingState={this.props.readingState} 
-                    changeShelf={this.changeShelf}
-                    bookId={this.props.id} shelf={this.props.shelf}>
+                    changeShelf={this.changeShelf} book={this.props.book}
+                    bookId={this.props.id} shelf={this.props.shelf}
+                    location={this.props.location}>
                   </BookShelfChanger> 
                 </div> 
                                

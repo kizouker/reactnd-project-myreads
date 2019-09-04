@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 import BookShelf from './BookShelf';
-import NotFound from './NotFound.js';
 import ls from 'local-storage'
 
 const ALL_BOOKS = "allbooks";
@@ -12,7 +11,6 @@ class SearchField extends React.Component{
     this.handleChange = this.handleChange.bind(this);
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
-    this.compare = this.props.compare.bind(this);
   }
 
 wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
@@ -25,6 +23,10 @@ handleChange = (event) => {
 
 render(){
   let allbooks = ls.get(ALL_BOOKS);
+
+    console.log("   location:"  );
+    console.log(this.props.location );
+
   this.wantToReadBooks = allbooks.filter(e => {
     return e.shelf === "wantToRead"});
     
@@ -71,7 +73,8 @@ render(){
                               readingState={item.shelf} 
                               shelfDescription={item.description}
                               removeBook={this.props.removeBook} 
-                              changeShelf={this.props.changeShelf}> 
+                              changeShelf={this.props.changeShelf}
+                              location={this.props.location}> 
                             </BookShelf>)})
                   }               
               </div>         
