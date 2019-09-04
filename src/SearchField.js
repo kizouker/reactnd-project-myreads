@@ -5,16 +5,38 @@ import ls from 'local-storage'
 
 const ALL_BOOKS = "allbooks";
 
+
 class SearchField extends React.Component{
   constructor(props){
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.changeShelf = this.props.changeShelf.bind(this);
     this.removeBook = this.props.removeBook.bind(this);
+
+
+    // create a ref to store the textInput DOM element
+    this.textInput = React.createRef();
+
+    this.focusTextInput = this.focusTextInput.bind(this);
   }
 
 wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
 
+
+
+componentDidMount(){
+
+this.focusTextInput();
+
+
+}
+
+focusTextInput = () => {
+
+  // Explicitly focus the text input using the raw DOM API
+   // Note: we're accessing "current" to get the DOM node
+   this.textInput.current.focus();
+}
 handleChange = (event) => {
   let searchString= event.target.value;
   this.props.updateSearchQuery(searchString);
@@ -56,13 +78,15 @@ render(){
                       description : "None", 
                       mybooks: this.none
                     }];
-
+//    
   return(<div>
             <div className="search-books">
                   <div className="search-books-bar">
                       <input type="text" placeholder="Search by title or author" 
+                              ref={this.textInput}
                               value={this.props.state.searchQuery}
-                              onChange={e => this.handleChange(e)}/>
+                              onChange={e => this.handleChange(e)}
+                      />
                   </div>
             </div>
             <div className="search-books-results">
