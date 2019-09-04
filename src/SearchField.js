@@ -12,6 +12,8 @@ class SearchField extends React.Component{
     // create a ref to store the textInput DOM element
     this.textInput = React.createRef();
     this.focusTextInput = this.focusTextInput.bind(this);
+
+    
   }
 
 wantToReadBooks; currentlyReadingBooks; readBooks; readingStates = [];
@@ -32,19 +34,23 @@ handleChange = (event) => {
 }
 
 render(){
-  console.log(this.props.location);
-  let allbooks = ls.get(ALL_BOOKS);
 
-  this.wantToReadBooks = allbooks.filter(e => {
+let allBooks = ls.get(ALL_BOOKS);
+  if (allBooks === null || allBooks === undefined){
+    allBooks = [];
+    ls.set(ALL_BOOKS, allBooks);
+  }
+
+  this.wantToReadBooks = allBooks.filter(e => {
     return e.shelf === "wantToRead"});
     
-  this.currentlyReadingBooks = allbooks.filter(e => {
+  this.currentlyReadingBooks = allBooks.filter(e => {
   return e.shelf === "currentlyReading"});
     
-  this.readBooks = allbooks.filter(e => {
+  this.readBooks = allBooks.filter(e => {
   return e.shelf === "read"});
     
-  this.none = allbooks.filter(e => {
+  this.none = allBooks.filter(e => {
     return e.shelf === "none"});
 
   this.readingStates = [
